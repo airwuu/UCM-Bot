@@ -36,6 +36,7 @@ fetch("https://widget.api.eagle.bigzpoon.com/menuitems?categoryId=61bd80d68b3464
     } else {
       console.warn('"menuItems" object not found in the JSON data.');
     }
+  }
 
 export default event(Events.MessageCreate, ({log}, msg) => {
     if (msg.content == 'menu') {
