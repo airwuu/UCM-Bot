@@ -1,7 +1,7 @@
 {
   "name": "ucm-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "��#\u0000 \u0000U\u0000C\u0000M\u0000-\u0000B\u0000o\u0000t\u0000\r\u0000 \u0000\r\u0000 \u0000H\u0000e\u0000l\u0000l\u0000o\u0000 \u0000t\u0000h\u0000e\u0000r\u0000e\u0000,\u0000 \u0000t\u0000h\u0000e\u0000r\u0000e\u0000 \u0000i\u0000s\u0000 \u0000n\u0000o\u0000t\u0000 \u0000m\u0000u\u0000c\u0000h\u0000 \u0000e\u0000l\u0000s\u0000e\u0000 \u0000I\u0000 \u0000w\u0000a\u0000n\u0000t\u0000 \u0000t\u0000o\u0000 \u0000w\u0000r\u0000i\u0000t\u0000e\u0000 \u0000h\u0000e\u0000r\u0000e\u0000.\u0000",
   "main": "./dist/index.js",
   "exports": "./dist/index.js",
   "scripts": {
@@ -13,7 +13,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/cheerio": "^0.22.35",
+    "@types/enzyme": "3.10.7",
     "@types/node": "^20.11.5",
+    "enzyme": "3.10.0",
     "nodemon": "^3.0.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
@@ -23,7 +27,10 @@
     "node": ">=16.0.0"
   },
   "dependencies": {
+    "axios": "^1.6.5",
+    "cheerio": "^1.0.0-rc.12",
     "discord.js": "^14.11.0",
-    "dotenv": "^16.3.2"
+    "dotenv": "^16.3.2",
+    "node-fetch": "^3.3.2"
   }
 }
