@@ -1,7 +1,8 @@
 import {event,Events} from '../utils/index.js'
 import fetch from 'node-fetch';
 let jsonData: any;
-fetch("https://widget.api.eagle.bigzpoon.com/menuitems?categoryId=61bd80d68b34640010e194b8&isPreview=false&locationId=61df4a34d5507a00103ee41e&menuGroupId=61bd808b5f2f930010bb6a7a&userPreferences=%7B%22allergies%22:%5B%5D,%22lifestyleChoices%22:%5B%5D,%22medicalGoals%22:%5B%7B%22id%22:%225e74c7e19888990010db39e3%22,%22value%22:%220%22%7D,%7B%22id%22:%225e74c8019888990010db39e5%22,%22value%22:%220%22%7D,%7B%22id%22:%225e74c82c9888990010db39e8%22,%22value%22:%220%22%7D,%7B%22id%22:%225e74c8399888990010db39e9%22,%22value%22:%220%22%7D,%7B%22id%22:%225e74c8599888990010db39ea%22,%22value%22:%220%22%7D,%7B%22id%22:%225e74c86a9888990010db39eb%22,%22value%22:%220%22%7D,%7B%22id%22:%225e74c8759888990010db39ec%22,%22value%22:%220%22%7D,%7B%22id%22:%225e74c87f9888990010db39ed%22,%22value%22:%220%22%7D%5D,%22preferenceApplyStatus%22:false,%22crossContactStatus%22:true%7D", {
+function fetchMenu() {
+  fetch("https://widget.api.eagle.bigzpoon.com/menuitems?categoryId=61bd80d68b34640010e194b8&isPreview=false&locationId=61df4a34d5507a00103ee41e&menuGroupId=61bd808b5f2f930010bb6a7a&userPreferences=%7B%22allergies%22:%5B%5D,%22lifestyleChoices%22:%5B%5D,%22medicalGoals%22:%5B%7B%22id%22:%225e74c7e19888990010db39e3%22,%22value%22:%220%22%7D,%7B%22id%22:%225e74c8019888990010db39e5%22,%22value%22:%220%22%7D,%7B%22id%22:%225e74c82c9888990010db39e8%22,%22value%22:%220%22%7D,%7B%22id%22:%225e74c8399888990010db39e9%22,%22value%22:%220%22%7D,%7B%22id%22:%225e74c8599888990010db39ea%22,%22value%22:%220%22%7D,%7B%22id%22:%225e74c86a9888990010db39eb%22,%22value%22:%220%22%7D,%7B%22id%22:%225e74c8759888990010db39ec%22,%22value%22:%220%22%7D,%7B%22id%22:%225e74c87f9888990010db39ed%22,%22value%22:%220%22%7D%5D,%22preferenceApplyStatus%22:false,%22crossContactStatus%22:true%7D", {
   "headers": {
     "accept": "application/json, text/plain, */*",
     "accept-language": "en-US,en;q=0.9",
@@ -21,27 +22,34 @@ fetch("https://widget.api.eagle.bigzpoon.com/menuitems?categoryId=61bd80d68b3464
   },
   "body": null,
   "method": "GET"
-})
+  })
   .then(response => response.json())
   .then(data => {
     jsonData = data;
     //console.log(JSON.stringify(data, null, 2))
   })
   .catch(error => console.error('Error:', error));
-  async function extractMenuGroupIds() {
-    // Ensure "menuGroupIds" exists before accessing it
-    if (jsonData.data.menuItems) {
-      const menuItems = jsonData.data.menuItems;
-      console.log(menuItems); // Do something with the extracted object
-    } else {
-      console.warn('"menuItems" object not found in the JSON data.');
-    }
+}
+
+function extractMenuItems() {
+  // Ensure "menuItems" exists before accessing it
+  fetchMenu();
+  if (jsonData.data.menuItems) {
+    const menuItems = jsonData.data.menuItems;
+    //let items: string[] = [];
+    // menuItems.forEach((element: { name: string; }) => {
+      
+    // });
+    console.log(menuItems); 
+  } else {
+    console.warn('"menuItems" object not found in the JSON data.');
   }
+}
 
 export default event(Events.MessageCreate, ({log}, msg) => {
     if (msg.content == 'menu') {
-      extractMenuGroupIds();
+      //extractMenuItems();
       //console.log(JSON.stringify(jsonData, null, 2));
-        return msg.reply('pong');
+      return msg.reply('okay');
     }
 })
