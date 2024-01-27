@@ -1,4 +1,4 @@
-import { Message } from 'discord.js';
+import { Message, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuOptionBuilder, StringSelectMenuBuilder, ComponentType  } from 'discord.js';
 import {event,Events} from '../utils/index.js'
 import fetch from 'node-fetch';
 let botResponseMessage: string;
@@ -87,11 +87,58 @@ function extractMenuItems() {
     return '';
   }
 }
+
+
+async function buildComponents(msg: Message<boolean>){
+  let value: string;
+  const selectLocation = new StringSelectMenuBuilder()
+			.setCustomId('location')
+			.setPlaceholder('Choose location!')
+			.addOptions(
+				new StringSelectMenuOptionBuilder()
+					.setLabel('Pavilion')
+					.setDescription('The big ugly building with more options.')
+					.setValue('pav'),
+				new StringSelectMenuOptionBuilder()
+					.setLabel('Dining Center')
+					.setDescription('The vibey place that has ice.')
+					.setValue('dc'),
+			);
+  const menu = new ActionRowBuilder<StringSelectMenuBuilder>()
+  .addComponents(selectLocation);
+
+  const exampleEmbed = new EmbedBuilder()
+	.setColor(0x0099FF)
+	.setTitle('Some title')
+	.setURL('https://discord.js.org/')
+	.setAuthor({ name: 'Some name', iconURL: 'https://i.imgur.com/AfFp7pu.png'})
+	.setDescription('Some description here')
+	.setThumbnail('https://i.imgur.com/AfFp7pu.png')
+	.addFields(
+		{ name: 'Regular field title', value: 'Some value here' },
+		{ name: '\u200B', value: '\u200B' },
+		{ name: 'Inline field title', value: 'Some value here', inline: true },
+		{ name: 'Inline field title', value: 'Some value here', inline: true },
+	)
+	.addFields({ name: 'Inline field title', value: 'Some value here', inline: true })
+	.setImage('https://i.imgur.com/AfFp7pu.png')
+	.setTimestamp()
+	.setFooter({ text: 'Some footer text here', iconURL: 'https://i.imgur.com/AfFp7pu.png' });
+
+  const sendMessage = (await msg.channel.send({ content: "hello", components: [menu], embeds: [exampleEmbed] })).createMessageComponentCollector({
+    componentType: ComponentType.StringSelect, 
+  });
+  sendMessage.on("collect", async (collected) => {
+     value = collected.values[0]; // first value in collector
+  });
+}
+
+
 async function fetchDataAndProcess(msg: Message<boolean>) {
   try {
     await fetchMenu(1,4,1);
     extractMenuItems();
-    msg.channel.send(botResponseMessage);
+    //msg.channel.send("water");
   } catch (error) {
     console.error('Error:', error);
   }
@@ -101,6 +148,7 @@ export default event(Events.MessageCreate, ({log}, msg) => {
     if (msg.content == 'menu') {
       fetchDataAndProcess(msg);
       //msg.reply('okay');
-      return msg.reply('okay');
+      buildComponents(msg);
+      return null;
     }
 })
