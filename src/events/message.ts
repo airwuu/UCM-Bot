@@ -81,16 +81,37 @@ function extractMenuItems() {
       itemsDesc.push(item.description);
     });
     //console.log(itemsNames.join(", ")); 
-    botResponseMessage = (itemsNames.join(", "));
+    //make item fields
+    let itemsField = [];
+    for(let i =0; i<itemsNames.length; i++){
+      itemsField.push({name : itemsNames[i], value: itemsDesc[i]});
+    }
+    return itemsField;
   } else {
     console.warn('"menuItems" object not found in the JSON data.');
-    return '';
+    return [];
   }
 }
-
+function buildEmbed(location: string = "pav", day: number = 0,category: number = 1){
+  console.log();
+  const fields = extractMenuItems();
+  const embed = new EmbedBuilder()
+	.setColor(0x0099FF)
+	.setTitle(location)
+	.setURL('https://discord.js.org/')
+	.setAuthor({ name: 'Some name', iconURL: 'https://i.imgur.com/AfFp7pu.png'})
+	.setDescription('Some description here')
+	.setThumbnail(location == "pav" ? 'https://dining.ucmerced.edu/sites/dining.ucmerced.edu/files/documents/pavilion_180806-2.jpeg':'https://dining.ucmerced.edu/sites/dining.ucmerced.edu/files/page/images/ucmerced_yablokoff_wallace.jpg')
+	.addFields(
+		fields
+	)
+	//.setImage('https://i.imgur.com/AfFp7pu.png')
+	.setTimestamp()
+	.setFooter({ text: 'Some footer text here', iconURL: 'https://i.imgur.com/AfFp7pu.png' });
+  return embed;
+}
 
 async function buildComponents(msg: Message<boolean>){
-  let value: string;
   const selectLocation = new StringSelectMenuBuilder()
 			.setCustomId('location')
 			.setPlaceholder('Choose location!')
@@ -107,29 +128,27 @@ async function buildComponents(msg: Message<boolean>){
   const menu = new ActionRowBuilder<StringSelectMenuBuilder>()
   .addComponents(selectLocation);
 
-  const exampleEmbed = new EmbedBuilder()
-	.setColor(0x0099FF)
-	.setTitle('Some title')
-	.setURL('https://discord.js.org/')
-	.setAuthor({ name: 'Some name', iconURL: 'https://i.imgur.com/AfFp7pu.png'})
-	.setDescription('Some description here')
-	.setThumbnail('https://i.imgur.com/AfFp7pu.png')
-	.addFields(
-		{ name: 'Regular field title', value: 'Some value here' },
-		{ name: '\u200B', value: '\u200B' },
-		{ name: 'Inline field title', value: 'Some value here', inline: true },
-		{ name: 'Inline field title', value: 'Some value here', inline: true },
-	)
-	.addFields({ name: 'Inline field title', value: 'Some value here', inline: true })
-	.setImage('https://i.imgur.com/AfFp7pu.png')
-	.setTimestamp()
-	.setFooter({ text: 'Some footer text here', iconURL: 'https://i.imgur.com/AfFp7pu.png' });
+  //add embed here
+  const menuEmbed = buildEmbed(); // default parameters
 
-  const sendMessage = (await msg.channel.send({ content: "hello", components: [menu], embeds: [exampleEmbed] })).createMessageComponentCollector({
+  const sendMessage = await msg.channel.send({ content: "hello", components: [menu], embeds: [menuEmbed] })
+  const collector = sendMessage.createMessageComponentCollector({
     componentType: ComponentType.StringSelect, 
+    time: 60_000,
   });
-  sendMessage.on("collect", async (collected) => {
-     value = collected.values[0]; // first value in collector
+  collector.on("collect", async(collected) => {
+    //console.log(collected.values[0])
+     if(collected.values[0] == "dc"){
+      await fetchMenu(1,4,1);
+      sendMessage.edit({content:"dc selected", embeds: [buildEmbed("dc")]})
+      return;
+     }
+     if(collected.values[0] == "pav"){
+      await fetchMenu(0,4,1);
+      sendMessage.edit({content:"pav selected", embeds: [buildEmbed("pav")]})
+      return;
+     }
+     
   });
 }
 
@@ -137,8 +156,8 @@ async function buildComponents(msg: Message<boolean>){
 async function fetchDataAndProcess(msg: Message<boolean>) {
   try {
     await fetchMenu(1,4,1);
-    extractMenuItems();
     //msg.channel.send("water");
+    buildComponents(msg);
   } catch (error) {
     console.error('Error:', error);
   }
@@ -147,8 +166,7 @@ async function fetchDataAndProcess(msg: Message<boolean>) {
 export default event(Events.MessageCreate, ({log}, msg) => {
     if (msg.content == 'menu') {
       fetchDataAndProcess(msg);
-      //msg.reply('okay');
-      buildComponents(msg);
+      
       return null;
     }
 })
