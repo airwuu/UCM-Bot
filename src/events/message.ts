@@ -2,7 +2,6 @@ import { Message, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, St
 import {event,Events} from '../utils/index.js'
 import fetch from 'node-fetch';
 let botResponseMessage: string;
-
 let jsonData: any;
 let idLocation: Array<string>;
 let idCategoryPav: Array<string>;
@@ -31,6 +30,67 @@ idDay = [ // also known as menu group
   '61bd80ba5f2f930010bb6a7f', // fri 5
   '61bd80bf8b34640010e194b6'  // sat 6
 ];
+function formatTimePAV(){
+  let m = [0,0]; // day, category
+  let dateTime = new Date();
+  //let today = dateTime.toLocaleDateString('en-US',{weekday: 'long'});
+  let day = dateTime.getDay();
+  let hour = dateTime.getHours();
+  let minute = dateTime.getMinutes();
+  if(day >= 1 && day <= 5){ // on weekdays
+    if ((hour < 21) && (hour >= 16)){ // Dinner before 9pm and  after 4pm
+      m = [day,2]
+    }
+    else if ((hour < 15) && (hour >= 11)){ // Lunch before 3pm and after 11am
+      m = [day,1]
+    }
+    else if ((hour < 10 && minute < 30) && (hour >= 7)){ // Breakfast before 10:30am and after 7am
+      m = [day,0]
+    }
+    else{ // closed
+      m = [0,0,0]
+    }
+  }
+  else{
+    if ((hour < 21) && (hour >= 16)){ // Dinner before 9pm and  after 4pm
+      m = [day,2]
+    }
+    else if ((hour < 15) && (hour >= 11)){ // Lunch before 3pm and after 11am
+      m = [day,1]
+    }
+    else if ((hour < 10 && minute < 30) && (hour >= 9)){ // Breakfast before 10:30am and after 7am
+      m = [day,0]
+    }
+    else{ // closed\
+      //console.log("pav is closed rn")
+      m = [0,0,0]
+    }
+  }
+  return m;
+}
+function formatTimeDC(){
+  let m = [0,0]; // day, category
+  let dateTime = new Date();
+  //let today = dateTime.toLocaleDateString('en-US',{weekday: 'long'});
+  let day = dateTime.getDay();
+  let hour = dateTime.getHours();
+  let minute = dateTime.getMinutes();
+  if(day >= 1 && day <= 5){ // on weekdays
+    if ((hour <= 23) && (hour >= 21)){ // late night before 0am and  after 9pm
+      m = [day,2]
+    }
+    else if ((hour < 20) && (hour >= 15)){ // dinner before 8pm and after 3pm
+      m = [day,1]
+    }
+    else if ((hour < 14) && (hour >= 10 && minute >= 30)){ // Lunch after 10:30am and before 2pm
+      m = [day,0]
+    }
+  }
+  else{//closed
+    m = [0,0]
+  }
+  return m;
+}
 
 function fetchMenu(locationNum: number = 0, dayNum: number = 0, categoryNum: number = 0) {
   return new Promise((resolve, reject) => {
@@ -92,22 +152,23 @@ function extractMenuItems() {
     return [];
   }
 }
-function buildEmbed(location: string = "pav", day: number = 0,category: number = 1){
-  console.log();
+function buildEmbed(location: string = "Pavilion", day: number = 0,category: number = 1){
   const fields = extractMenuItems();
+  let dateTime = new Date();
+  let today = dateTime.toLocaleDateString('en-US',{weekday: 'long'});
   const embed = new EmbedBuilder()
-	.setColor(0x0099FF)
-	.setTitle(location)
-	.setURL('https://discord.js.org/')
-	.setAuthor({ name: 'Some name', iconURL: 'https://i.imgur.com/AfFp7pu.png'})
-	.setDescription('Some description here')
-	.setThumbnail(location == "pav" ? 'https://dining.ucmerced.edu/sites/dining.ucmerced.edu/files/documents/pavilion_180806-2.jpeg':'https://dining.ucmerced.edu/sites/dining.ucmerced.edu/files/page/images/ucmerced_yablokoff_wallace.jpg')
+	.setColor(0xC6EBF4)
+	.setTitle(`Menu at ${location}`)
+	.setURL('https://uc-merced-the-pavilion.widget.eagle.bigzpoon.com/menus')
+	.setAuthor({ name: 'Some cool bot name', iconURL: 'https://i.pinimg.com/736x/5c/b6/aa/5cb6aa8b2d9352b40b0cef5e1177e7a5.jpg'})
+	.setDescription((fields.length == 0)?'This location is closed right now':`Here's the menu right now!`)
+	.setThumbnail(location == "Pavilion" ? 'https://dining.ucmerced.edu/sites/dining.ucmerced.edu/files/documents/pavilion_180806-2.jpeg':'https://dining.ucmerced.edu/sites/dining.ucmerced.edu/files/page/images/ucmerced_yablokoff_wallace.jpg')
 	.addFields(
 		fields
 	)
 	//.setImage('https://i.imgur.com/AfFp7pu.png')
 	.setTimestamp()
-	.setFooter({ text: 'Some footer text here', iconURL: 'https://i.imgur.com/AfFp7pu.png' });
+	.setFooter({ text: 'response was generated ' });
   return embed;
 }
 
@@ -119,44 +180,51 @@ async function buildComponents(msg: Message<boolean>){
 				new StringSelectMenuOptionBuilder()
 					.setLabel('Pavilion')
 					.setDescription('The big ugly building with more options.')
-					.setValue('pav'),
+					.setValue('Pavilion'),
 				new StringSelectMenuOptionBuilder()
 					.setLabel('Dining Center')
 					.setDescription('The vibey place that has ice.')
-					.setValue('dc'),
+					.setValue('Dining Center'),
 			);
   const menu = new ActionRowBuilder<StringSelectMenuBuilder>()
   .addComponents(selectLocation);
 
-  //add embed here
+  //add initial call for pav
+  let initialMenuParameters = formatTimePAV();
+  if(initialMenuParameters.length <= 2){
+    await fetchMenu(0,initialMenuParameters[0],initialMenuParameters[1]);
+  }
   const menuEmbed = buildEmbed(); // default parameters
 
-  const sendMessage = await msg.channel.send({ content: "hello", components: [menu], embeds: [menuEmbed] })
+  const sendMessage = await msg.channel.send({ content: "hello, heres pav menu for now", components: [menu], embeds: [menuEmbed] })
   const collector = sendMessage.createMessageComponentCollector({
     componentType: ComponentType.StringSelect, 
-    time: 60_000,
+    time: 120_000,
   });
   collector.on("collect", async(collected) => {
     //console.log(collected.values[0])
-     if(collected.values[0] == "dc"){
-      await fetchMenu(1,4,1);
-      sendMessage.edit({content:"dc selected", embeds: [buildEmbed("dc")]})
+     if(collected.values[0] == "Dining Center"){
+      let menuParameters = formatTimeDC();
+      await fetchMenu(1,menuParameters[0],menuParameters[1]);
+      collected.update({content:"dc selected", embeds: [buildEmbed("Dining Center")]})
       return;
      }
-     if(collected.values[0] == "pav"){
-      await fetchMenu(0,4,1);
-      sendMessage.edit({content:"pav selected", embeds: [buildEmbed("pav")]})
+     if(collected.values[0] == "Pavilion"){
+      let menuParameters = formatTimePAV();
+      if(menuParameters.length <= 2){
+        await fetchMenu(0,menuParameters[0],menuParameters[1]);
+      }
+      collected.update({content:"pav selected", embeds: [buildEmbed("Pavilion")]})
       return;
      }
      
   });
 }
 
-
 async function fetchDataAndProcess(msg: Message<boolean>) {
   try {
-    await fetchMenu(1,4,1);
-    //msg.channel.send("water");
+    let menuParameters = formatTimePAV();
+    await fetchMenu(1,menuParameters[0],menuParameters[1]);
     buildComponents(msg);
   } catch (error) {
     console.error('Error:', error);
@@ -166,7 +234,6 @@ async function fetchDataAndProcess(msg: Message<boolean>) {
 export default event(Events.MessageCreate, ({log}, msg) => {
     if (msg.content == 'menu') {
       fetchDataAndProcess(msg);
-      
       return null;
     }
 })
