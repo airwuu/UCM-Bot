@@ -217,8 +217,25 @@ async function buildComponents(msg: Message<boolean>){
       collected.update({content:"pav selected", embeds: [buildEmbed("Pavilion")]})
       return;
      }
-     
   });
+  const removeOptions = new StringSelectMenuBuilder()
+			.setCustomId('removeOptions')
+			.setPlaceholder('Menu timed out')
+			.addOptions(
+				new StringSelectMenuOptionBuilder()
+					.setLabel('so nothing works')
+					.setDescription('why are you trying')
+					.setValue('a'),
+				new StringSelectMenuOptionBuilder()
+					.setLabel('this one wont either')
+					.setDescription('dont try it')
+					.setValue('b'),
+			);
+  const rOptions = new ActionRowBuilder<StringSelectMenuBuilder>()
+  .addComponents(selectLocation);
+  collector.on('end', async(collected) => {
+    sendMessage.edit({components: [rOptions]});
+  })
 }
 
 async function fetchDataAndProcess(msg: Message<boolean>) {
