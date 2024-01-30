@@ -1,8 +1,11 @@
 import {Event} from '../utils/index.js';
 import ready from './ready.js';
-import message from './message.js'
+import temp from './temp.js';
+import menu from './menu.js';
 
 export default [
     ready,
-    message,
+    temp,
+    menu,
 ] as Event[];
+
