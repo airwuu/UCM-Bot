@@ -179,7 +179,7 @@ async function buildComponents(msg: Message<boolean>){
 			.addOptions(
 				new StringSelectMenuOptionBuilder()
 					.setLabel('Pavilion')
-					.setDescription('The big ugly building with more options.')
+					.setDescription('The big orange building with more options.')
 					.setValue('Pavilion'),
 				new StringSelectMenuOptionBuilder()
 					.setLabel('Dining Center')
@@ -232,7 +232,7 @@ async function buildComponents(msg: Message<boolean>){
 					.setValue('b'),
 			);
   const rOptions = new ActionRowBuilder<StringSelectMenuBuilder>()
-  .addComponents(selectLocation);
+  .addComponents(removeOptions);
   collector.on('end', async(collected) => {
     sendMessage.edit({components: [rOptions]});
   })
