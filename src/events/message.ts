@@ -138,13 +138,13 @@ function extractMenuItems() {
     });
     let itemsDesc:string[] = [];
     menuItems.forEach((item: { description: string; }) => {
-      itemsDesc.push(item.description);
+      itemsDesc.push(item.description.replace(/ *\([^)]*\) */g, "").replace(": ",":\n- ").replace(", ","\n- "));
     });
     //console.log(itemsNames.join(", ")); 
     //make item fields
     let itemsField = [];
     for(let i =0; i<itemsNames.length; i++){
-      itemsField.push({name : itemsNames[i], value: itemsDesc[i]});
+      itemsField.push({name : ("*"+itemsNames[i]+"*"), value: ("```" +(itemsDesc[i])+"```")});
     }
     return itemsField;
   } else {
@@ -161,14 +161,14 @@ function buildEmbed(location: string = "Pavilion", day: number = 0,category: num
 	.setTitle(`Menu at ${location}`)
 	.setURL('https://uc-merced-the-pavilion.widget.eagle.bigzpoon.com/menus')
 	.setAuthor({ name: 'Some cool bot name', iconURL: 'https://i.pinimg.com/736x/5c/b6/aa/5cb6aa8b2d9352b40b0cef5e1177e7a5.jpg'})
-	.setDescription((fields.length == 0)?'This location is closed right now':`Here's the menu right now!`)
+	.setDescription((fields.length == 0)?'This location is closed right now':` `)//removed string
 	.setThumbnail(location == "Pavilion" ? 'https://dining.ucmerced.edu/sites/dining.ucmerced.edu/files/documents/pavilion_180806-2.jpeg':'https://dining.ucmerced.edu/sites/dining.ucmerced.edu/files/page/images/ucmerced_yablokoff_wallace.jpg')
 	.addFields(
 		fields
 	)
 	//.setImage('https://i.imgur.com/AfFp7pu.png')
 	.setTimestamp()
-	.setFooter({ text: 'response was generated ' });
+	//.setFooter({ text: 'response was generated ' });
   return embed;
 }
 
@@ -206,7 +206,7 @@ async function buildComponents(msg: Message<boolean>){
      if(collected.values[0] == "Dining Center"){
       let menuParameters = formatTimeDC();
       await fetchMenu(1,menuParameters[0],menuParameters[1]);
-      collected.update({content:"dc selected", embeds: [buildEmbed("Dining Center")]})
+      collected.update({embeds: [buildEmbed("Dining Center")]})
       return;
      }
      if(collected.values[0] == "Pavilion"){
@@ -214,7 +214,7 @@ async function buildComponents(msg: Message<boolean>){
       if(menuParameters.length <= 2){
         await fetchMenu(0,menuParameters[0],menuParameters[1]);
       }
-      collected.update({content:"pav selected", embeds: [buildEmbed("Pavilion")]})
+      collected.update({ embeds: [buildEmbed("Pavilion")]})
       return;
      }
   });
