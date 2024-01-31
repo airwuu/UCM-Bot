@@ -138,7 +138,7 @@ function extractMenuItems() {
     });
     let itemsDesc:string[] = [];
     menuItems.forEach((item: { description: string; }) => {
-      itemsDesc.push(item.description.replace(/ *\([^)]*\) */g, "").replace(": ",":\n- ").replace(", ","\n- "));
+      itemsDesc.push(item.description.replace(/ *\([^)]*\) */g, "").replace(": ",":\n- ").replace(", with ","\n- ").replace(", ","\n- "));
     });
     //console.log(itemsNames.join(", ")); 
     //make item fields
