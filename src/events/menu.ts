@@ -200,7 +200,7 @@ function formatTimeDC(){
     else if ((hour < 20) && (hour >= 15)){ // dinner before 8pm and after 3pm
       m = [day,1]
     }
-    else if ((hour < 14) && (hour >= 10 && minute >= 30)){ // Lunch after 10:30am and before 2pm
+    else if ((hour < 14) && ((hour >= 10)||(hour >= 10 && minute >= 30))){ // Lunch after 10:30am and before 2pm
       m = [day,0]
     }
   }
