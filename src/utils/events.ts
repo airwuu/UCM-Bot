@@ -26,6 +26,7 @@ export function event<T extends EventKeys>(key: T, callback: EventCallback<T>): 
 export function registerEvents(client: Client, events: Event[]): void {
     for (const{key,callback} of events){
         client.on(key, (...args)=>{
+            //console.log(`[Event: ${key}]`);
             const log = console.log.bind(console, `[Event: ${key}]`);
             try {
                 callback({client,log}, ...args);

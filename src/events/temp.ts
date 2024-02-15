@@ -123,7 +123,7 @@ function dcMenuGroupTime() {
 }
 
 export default event(Events.MessageCreate, ({log}, msg) => {
-    if (msg.content == 'temp') {
+    if (msg.content == 'tempsadasdsa') {
       //msg.reply(pavMenuGroupTime());
       msg.reply(dcMenuGroupTime());
       return null;

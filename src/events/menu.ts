@@ -1,4 +1,4 @@
-import { Message, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuOptionBuilder, StringSelectMenuBuilder, ComponentType  } from 'discord.js';
+import { Message, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuOptionBuilder, StringSelectMenuBuilder, ComponentType, CacheType, ChatInputCommandInteraction  } from 'discord.js';
 import {event,Events} from '../utils/index.js'
 import fetch from 'node-fetch';
 let jsonData: any;
@@ -372,3 +372,82 @@ export default event(Events.MessageCreate, ({log}, msg) => {
       return null;
     }
 })
+
+// slash command
+async function buildComponents2(msg: ChatInputCommandInteraction<CacheType>){
+  const selectLocation = new StringSelectMenuBuilder()
+			.setCustomId('location')
+			.setPlaceholder('Choose location!')
+			.addOptions(
+				new StringSelectMenuOptionBuilder()
+					.setLabel('Pavilion')
+					.setDescription('The big orange building with more options.')
+					.setValue('Pavilion'),
+				new StringSelectMenuOptionBuilder()
+					.setLabel('Dining Center')
+					.setDescription('The vibey place that has ice.')
+					.setValue('Dining Center'),
+			);
+  const menu = new ActionRowBuilder<StringSelectMenuBuilder>()
+  .addComponents(selectLocation);
+
+  //add initial call for pav
+  let initialMenuParameters = formatTimePAV();
+  if(initialMenuParameters.length <= 2){
+    await fetchMenu(0,initialMenuParameters[0],initialMenuParameters[1]);
+  }
+  const menuEmbed = buildEmbed(); // default parameters
+
+  const sendMessage = await msg.reply({ components: [menu], embeds: [menuEmbed], ephemeral: true })
+  const collector = sendMessage.createMessageComponentCollector({
+    componentType: ComponentType.StringSelect, 
+    time: 120_000,
+  });
+  collector.on("collect", async(collected) => {
+    //console.log(collected.values[0])
+     if(collected.values[0] == "Dining Center"){
+      let menuParameters = formatTimeDC();
+      await fetchMenu(1,menuParameters[0],menuParameters[1]);
+      collected.update({embeds: [buildEmbed("Dining Center")]})
+      return;
+     }
+     if(collected.values[0] == "Pavilion"){
+      let menuParameters = formatTimePAV();
+      if(menuParameters.length <= 2){
+        await fetchMenu(0,menuParameters[0],menuParameters[1]);
+      }
+      collected.update({ embeds: [buildEmbed("Pavilion")]})
+      return;
+     }
+  });
+  const removeOptions = new StringSelectMenuBuilder()
+			.setCustomId('removeOptions')
+			.setPlaceholder('Menu timed out')
+			.addOptions(
+				new StringSelectMenuOptionBuilder()
+					.setLabel('so nothing works')
+					.setDescription('why are you trying')
+					.setValue('a'),
+				new StringSelectMenuOptionBuilder()
+					.setLabel('this one wont either')
+					.setDescription('dont try it')
+					.setValue('b'),
+			);
+  const rOptions = new ActionRowBuilder<StringSelectMenuBuilder>()
+  .addComponents(removeOptions);
+  collector.on('end', async(collected) => {
+    sendMessage.edit({components: [rOptions]});
+  })
+}
+async function fetchDataAndProcess2(msg: ChatInputCommandInteraction<CacheType>) {
+  try {
+    let menuParameters = formatTimePAV();
+    await fetchMenu(1,menuParameters[0],menuParameters[1]);
+    buildComponents2(msg);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+export function replyMenu(msg: ChatInputCommandInteraction<CacheType>) {
+  fetchDataAndProcess2(msg);
+}
