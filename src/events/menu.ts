@@ -278,7 +278,7 @@ function buildEmbed(location: string = "Pavilion", day: number = 0,category: num
 	.setColor(0xC6EBF4)
 	.setTitle(`Menu at ${location}`)
 	.setURL('https://uc-merced-the-pavilion.widget.eagle.bigzpoon.com/menus')
-	.setAuthor({ name: 'Some cool bot name', iconURL: 'https://i.pinimg.com/736x/5c/b6/aa/5cb6aa8b2d9352b40b0cef5e1177e7a5.jpg'})
+	// .setAuthor({ name: 'Rufina', iconURL: 'https://media.discordapp.net/attachments/1199234312994832434/1208490175508910090/00038-2410077578.png?ex=65e3792e&is=65d1042e&hm=86bfd1aacaf3a8e43e5edbc201301056955f9a6420d3f1126f79dba719f83915&=&format=webp&quality=lossless&width=320&height=560'})
 	.setDescription((location == "Pavilion") ? pavMenuGroupTime():dcMenuGroupTime())
 	.setThumbnail(location == "Pavilion" ? 'https://dining.ucmerced.edu/sites/dining.ucmerced.edu/files/documents/pavilion_180806-2.jpeg':'https://dining.ucmerced.edu/sites/dining.ucmerced.edu/files/page/images/ucmerced_yablokoff_wallace.jpg')
 	.addFields(
