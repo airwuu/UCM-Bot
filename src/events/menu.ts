@@ -443,7 +443,7 @@ async function fetchDataAndProcess2(msg: ChatInputCommandInteraction<CacheType>)
   try {
     let menuParameters = formatTimePAV();
     await fetchMenu(1,menuParameters[0],menuParameters[1]);
-    buildComponents2(msg);
+    await buildComponents2(msg);
   } catch (error) {
     console.error('Error:', error);
   }
