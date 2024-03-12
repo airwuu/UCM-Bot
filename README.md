@@ -5,4 +5,7 @@
 
 A discord chat bot written in typescript that fetches dining hall menus.
 
-Users should be able to quickly compare menus and assert which dining hall best suits their need at that very moment.
+Users are able to quickly compare menus and assert which dining hall best suits their need at that very moment.
+
+![Untitled(1)](https://github.com/airhornwho/UCM-Bot/assets/77591592/65e25b06-02c8-4b6b-bb1e-e23d36eba82f)
+
