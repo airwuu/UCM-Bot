@@ -341,13 +341,9 @@ async function buildComponents(msg: Message<boolean>){
 			.setPlaceholder('Menu timed out')
 			.addOptions(
 				new StringSelectMenuOptionBuilder()
-					.setLabel('so nothing works')
-					.setDescription('why are you trying')
+					.setLabel('Use slash command again')
+					.setDescription('Discord times out this command after 2 minutes')
 					.setValue('a'),
-				new StringSelectMenuOptionBuilder()
-					.setLabel('this one wont either')
-					.setDescription('dont try it')
-					.setValue('b'),
 			);
   const rOptions = new ActionRowBuilder<StringSelectMenuBuilder>()
   .addComponents(removeOptions);
