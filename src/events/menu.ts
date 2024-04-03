@@ -1,7 +1,9 @@
 import { Message, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuOptionBuilder, StringSelectMenuBuilder, ComponentType, CacheType, ChatInputCommandInteraction  } from 'discord.js';
 import {event,Events} from '../utils/index.js'
 import fetch from 'node-fetch';
+import * as fs from 'fs';
 let jsonData: any;
+let usageData: any;
 let idLocation: Array<string>;
 let idCategoryPav: Array<string>;
 let idCategoryDC: Array<string>;
@@ -273,7 +275,8 @@ function extractMenuItems() {
 function buildEmbed(location: string = "Pavilion", day: number = 0,category: number = 1){
   const fields = extractMenuItems();
   let dateTime = new Date();
-  let today = dateTime.toLocaleDateString('en-US',{weekday: 'long'});
+  let today = dateTime.toDateString();
+  //dateTime.toLocaleDateString('en-US',{weekday: 'long'});
   const embed = new EmbedBuilder()
 	.setColor(0xC6EBF4)
 	.setTitle(`Menu at ${location}`)
@@ -287,6 +290,37 @@ function buildEmbed(location: string = "Pavilion", day: number = 0,category: num
 	//.setImage('https://i.imgur.com/AfFp7pu.png')
 	.setTimestamp()
 	//.setFooter({ text: 'response was generated ' });
+  
+  //add user statistics
+  console.log(today)
+  const filePath = './menu_usage.json';
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading file:', err);
+      return;
+    }
+
+    try {
+      const menuData = JSON.parse(data);
+      //update
+      if(menuData[today]){
+      menuData[today] = menuData[today]+1;
+      }
+      else{
+        menuData[today] = 0;
+      }
+
+      fs.writeFile(filePath, JSON.stringify(menuData, null, 2), 'utf8', (err) => {
+        if (err) {
+          console.error('Error writing to file:', err);
+          return;
+        }
+        console.log('Logged embed build in menu_usage.json');
+      });
+    } catch (err) {
+      console.error('Error parsing JSON:', err);
+    }
+  });
   return embed;
 }
 
