@@ -363,7 +363,7 @@ async function fetchDataAndProcess(msg: Message<boolean>) {
 }
 
 export default event(Events.MessageCreate, ({log}, msg) => {
-    if (msg.content == 'menu') {
+    if (msg.content == 'menu' || msg.content == 'Menu') {
       fetchDataAndProcess(msg);
       return null;
     }
