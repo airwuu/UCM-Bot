@@ -291,8 +291,8 @@ function buildEmbed(location: string = "Pavilion", day: number = 0,category: num
 	.setTimestamp()
 	//.setFooter({ text: 'response was generated ' });
   
-  //add user statistics
-  console.log(today)
+  //add user statistics ---------------
+  //console.log(today)
   const filePath = './menu_usage.json';
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
@@ -303,8 +303,8 @@ function buildEmbed(location: string = "Pavilion", day: number = 0,category: num
     try {
       const menuData = JSON.parse(data);
       //update
-      if(menuData[today]){
-      menuData[today] = menuData[today]+1;
+      if(menuData[today]>=0){
+        menuData[today] = menuData[today]+1;
       }
       else{
         menuData[today] = 0;
