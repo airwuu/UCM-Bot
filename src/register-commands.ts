@@ -23,7 +23,7 @@ export async function registerCommands() {
       Routes.applicationCommands(
         Keys.clientID,
       ),
-      { body: commands }
+      { body: [] } // replace [] with "commands"
     );
 
     console.log('Slash commands were registered successfully!');

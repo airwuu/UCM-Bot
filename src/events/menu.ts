@@ -307,7 +307,7 @@ function buildEmbed(location: string = "Pavilion", day: number = 0,category: num
         menuData[today] = menuData[today]+1;
       }
       else{
-        menuData[today] = 0;
+        menuData[today] = 1;
       }
 
       fs.writeFile(filePath, JSON.stringify(menuData, null, 2), 'utf8', (err) => {
